@@ -1,0 +1,467 @@
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 灵魂体样式 */
+        .soul-character {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ff6b6b 0%, #4ecdc4 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.7);
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            transition: transform 0.1s ease-out;
+        }
+        
+        .soul-glow {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+        
+        /* 六道轮回界面 */
+        .six-paths-ui {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .path-button {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .path-button:hover {
+            transform: scale(1.1);
+            border-color: #ff6b6b;
+        }
+        
+        .path-button.active {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        /* DNA显示 */
+        .dna-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 300px;
+        }
+        
+        .dna-title {
+            color: #4ecdc4;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .dna-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .dna-tag {
+            background: rgba(78, 205, 196, 0.2);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        /* 战斗界面 */
+        .combat-ui {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+border: 1px solid rgba(255, 255, 255, 0.3);
+            display: none;
+            z-index: 200;
+        }
+        
+        .combat-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .combat-action {
+            padding: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .combat-action:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 种子农场 */
+        .seed-farm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .seed-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+        
+        .seed-button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .seed-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+        
+        /* 隐藏元素 */
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- 灵魂体角色 -->
+        <div class="soul-character" id="soulCharacter">
+            <div class="soul-glow"></div>
+        </div>
+        
+        <!-- DNA显示 -->
+        <div class="dna-display" id="dnaDisplay">
+            <div class="dna-title">DNA標籤</div>
+            <div class="dna-tags" id="dnaTags">
+                <span class="dna-tag">新人類</span>
+                <span class="dna-tag">靈魂體</span>
+            </div>
+        </div>
+        
+        <!-- 六道轮回界面 -->
+        <div class="six-paths-ui" id="sixPathsUI">
+            <div class="path-button" data-path="seed">🌱</div>
+            <div class="path-button" data-path="warehouse">📦</div>
+            <div class="path-button" data-path="combat">⚔️</div>
+            <div class="path-button" data-path="worlds">🌍</div>
+        </div>
+        
+        <!-- 种子农场 -->
+        <div class="seed-farm hidden" id="seedFarm">
+            <div class="seed-icon">🌱</div>
+            <h2>六道種子</h2>
+            <p>種下六道種子，開啟你的輪迴之旅</p>
+            <button class="seed-button" id="plantSeedBtn">種植種子</button>
+        </div>
+        
+        <!-- 战斗界面 -->
+        <div class="combat-ui" id="combatUI">
+            <h3>戰鬥選擇</h3>
+            <div class="combat-actions">
+                <div class="combat-action" data-action="attack">攻擊</div>
+                <div class="combat-action" data-action="defend">防禦</div>
+                <div class="combat-action" data-action="dna">DNA技能</div>
+                <div class="combat-action" data-action="item">使用物品</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态
+        const gameState = {
+            soulPosition: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+            currentUI: 'main',
+            dnaTags: ['新人類', '靈魂體'],
+            isDragging: false,
+            lastTouch: { x: 0, y: 0 }
+        };
+
+        // DOM元素
+        const soulCharacter = document.getElementById('soulCharacter');
+        const sixPathsUI = document.getElementById('sixPathsUI');
+        const seedFarm = document.getElementById('seedFarm');
+        const combatUI = document.getElementById('combatUI');
+const plantSeedBtn = document.getElementById('plantSeedBtn');
+        const dnaTagsElement = document.getElementById('dnaTags');
+
+        // 初始化灵魂体位置
+        updateSoulPosition();
+
+        // 触摸事件处理
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+        document.addEventListener('touchend', handleTouchEnd, false);
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            gameState.isDragging = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!gameState.isDragging) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            
+            gameState.soulPosition.x += deltaX;
+            gameState.soulPosition.y += deltaY;
+            
+            // 边界限制
+            gameState.soulPosition.x = Math.max(30, Math.min(window.innerWidth - 30, gameState.soulPosition.x));
+            gameState.soulPosition.y = Math.max(30, Math.min(window.innerHeight - 30, gameState.soulPosition.y));
+            
+            updateSoulPosition();
+            
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            gameState.isDragging = false;
+        }
+
+        // 更新灵魂体位置
+        function updateSoulPosition() {
+            soulCharacter.style.left = gameState.soulPosition.x + 'px';
+            soulCharacter.style.top = gameState.soulPosition.y + 'px';
+        }
+
+        // 六道轮回按钮点击
+        document.querySelectorAll('.path-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const path = this.dataset.path;
+                switch(path) {
+                    case 'seed':
+                        showSeedFarm();
+                        break;
+                    case 'combat':
+                        showCombatUI();
+                        break;
+                    case 'warehouse':
+                        alert('倉庫功能開發中...');
+                        break;
+                    case 'worlds':
+                        alert('世界選擇功能開發中...');
+                        break;
+                }
+            });
+        });
+
+        // 种子农场功能
+        function showSeedFarm() {
+            seedFarm.classList.remove('hidden');
+            sixPathsUI.classList.add('hidden');
+        }
+
+        plantSeedBtn.addEventListener('click', function() {
+            alert('六道種子已種植！\n你將進入第一個世界線...');
+            seedFarm.classList.add('hidden');
+            sixPathsUI.classList.remove('hidden');
+            
+            // 添加新的DNA标签
+            addDNATag('六道輪迴者');
+        });
+
+        // 战斗界面
+        function showCombatUI() {
+            combatUI.style.display = 'block';
+        }
+document.querySelectorAll('.combat-action').forEach(action => {
+            action.addEventListener('click', function() {
+                const actionType = this.dataset.action;
+                switch(actionType) {
+                    case 'attack':
+                        alert('發動攻擊！');
+                        break;
+                    case 'defend':
+                        alert('進入防禦狀態！');
+                        break;
+                    case 'dna':
+                        if (gameState.dnaTags.length > 2) {
+                            alert('使用DNA技能：' + gameState.dnaTags[2]);
+                        } else {
+                            alert('沒有可用的DNA技能');
+                        }
+                        break;
+                    case 'item':
+                        alert('物品系統開發中...');
+                        break;
+                }
+                combatUI.style.display = 'none';
+            });
+        });
+
+        // DNA标签管理
+        function addDNATag(tag) {
+            if (!gameState.dnaTags.includes(tag)) {
+                gameState.dnaTags.push(tag);
+                updateDNADisplay();
+            }
+        }
+
+        function updateDNADisplay() {
+            dnaTagsElement.innerHTML = '';
+            gameState.dnaTags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'dna-tag';
+                tagElement.textContent = tag;
+                dnaTagsElement.appendChild(tagElement);
+            });
+        }
+
+        // 窗口大小调整
+        window.addEventListener('resize', function() {
+            // 重新限制灵魂体位置
+            gameState.soulPosition.x = Math.max(30, Math.min(window.innerWidth - 30, gameState.soulPosition.x));
+            gameState.soulPosition.y = Math.max(30, Math.min(window.innerHeight - 30, gameState.soulPosition.y));
+            updateSoulPosition();
+        });
+
+        // 初始化提示
+        setTimeout(() => {
+            alert('歡迎來到新人類世界！\n\n用手指拖動靈魂體移動\n點擊底部按鈕探索功能');
+        }, 1000);
+    </script>
+</body>
+</html>document.querySelectorAll('.combat-action').forEach(action => {
+            action.addEventListener('click', function() {
+                const actionType = this.dataset.action;
+                switch(actionType) {
+                    case 'attack':
+                        alert('發動攻擊！');
+                        break;
+                    case 'defend':
+                        alert('進入防禦狀態！');
+                        break;
+                    case 'dna':
+                        if (gameState.dnaTags.length > 2) {
+                            alert('使用DNA技能：' + gameState.dnaTags[2]);
+                        } else {
+                            alert('沒有可用的DNA技能');
+                        }
+                        break;
+                    case 'item':
+                        alert('物品系統開發中...');
+                        break;
+                }
+                combatUI.style.display = 'none';
+            });
+        });
+
+        // DNA标签管理
+        function addDNATag(tag) {
+            if (!gameState.dnaTags.includes(tag)) {
+                gameState.dnaTags.push(tag);
+                updateDNADisplay();
+            }
+        }
+
+        function updateDNADisplay() {
+            dnaTagsElement.innerHTML = '';
+            gameState.dnaTags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'dna-tag';
+                tagElement.textContent = tag;
+                dnaTagsElement.appendChild(tagElement);
+            });
+        }
+
+        // 窗口大小调整
+        window.addEventListener('resize', function() {
+            // 重新限制灵魂体位置
+            gameState.soulPosition.x = Math.max(30, Math.min(window.innerWidth - 30, gameState.soulPosition.x));
+            gameState.soulPosition.y = Math.max(30, Math.min(window.innerHeight - 30, gameState.soulPosition.y));
+            updateSoulPosition();
+        });
+
+        // 初始化提示
+        setTimeout(() => {
+            alert('歡迎來到新人類世界！\n\n用手指拖動靈魂體移動\n點擊底部按鈕探索功能');
+        }, 1000);
+    </script>
+</body>
+</html>
